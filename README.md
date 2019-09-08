@@ -2,7 +2,7 @@
 
 This is a test-bed playing with Akka.net event adapters to persist data using the protobuf-net library.
 
-In short, the following event adapter is being used to persist data [here](blob/master/Application/ProtobufEventAdapter.cs).
+In short, the following event adapter is being used to persist data [here](Application/ProtobufEventAdapter.cs).
 
 ```
     public class ProtobufEventAdapter : IEventAdapter
