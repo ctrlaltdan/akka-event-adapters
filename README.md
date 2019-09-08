@@ -35,6 +35,7 @@ In short, the following event adapter is being used to persist data [here](Appli
                 .ToDictionary(key => ((JournalEntryAttribute)key.attribute).Manifest, value => value.type);
         }
 
+        // Get value from dto decorated JournalEntryAttribute(manifest)
         public string Manifest(object evt)
         {
             var attribute = evt
@@ -48,6 +49,7 @@ In short, the following event adapter is being used to persist data [here](Appli
             return ((JournalEntryAttribute)attribute).Manifest;
         }
 
+        // Convert ProtoContract to byte[]
         public object ToJournal(object evt)
         {
             using (var stream = new MemoryStream())
@@ -57,6 +59,7 @@ In short, the following event adapter is being used to persist data [here](Appli
             }
         }
 
+        // Convert incoming evt (byte[]) back to dto type using the static Dtos dictionary keyed on the manifest name 
         public IEventSequence FromJournal(object evt, string manifest)
         {
             if (!(evt is byte[] bytes))
