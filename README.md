@@ -78,14 +78,19 @@ In short, the following event adapter is being used to persist data [here](Appli
 **InMemory persistence**
 
 ✔️ `public string Manifest(object evt)` returns `Manifest` property from `JournalEntry` attribute.
+
 ✔️ `public object ToJournal(object evt)` converts object to byte[].
+
 ✔️ `public IEventSequence FromJournal(object evt, string manifest)` object is byte[], manifest is string declared above.
 
 **Kafka persistence**
 
 ✔️ `public string Manifest(object evt)` returns `Manifest` property from `JournalEntry` attribute.
+
 ✔️ `public object ToJournal(object evt)` converts object to byte[].
+
 ❌ `public IEventSequence FromJournal(object evt, string manifest)` returns exception:
+
 ```
 MongoDb: System.TypeLoadException: Could not load type '<my type defined above in Manifest(obj) above>' from assembly 'Akka.Persistence.MongoDb, Version=1.3.12.0
 ```
@@ -93,5 +98,7 @@ MongoDb: System.TypeLoadException: Could not load type '<my type defined above i
 **Sql persistence**
 
 ✔️ `public string Manifest(object evt)` returns `Manifest` property from `JournalEntry` attribute.
+
 ✔️ `public object ToJournal(object evt)` converts object to byte[].
+
 ❌ `public IEventSequence FromJournal(object evt, string manifest)` object is byte[], manifest is empty string (empty string is what is stored in sql table).
