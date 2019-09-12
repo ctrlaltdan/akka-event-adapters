@@ -26,12 +26,12 @@ namespace Host
 				                auto-initialize = on
 
                                 event-adapters {
-                                    protobuf = ""Application.ProtobufEventAdapter, Application""
+                                    protobuf = ""Application.Persistence.ProtobufEventAdapter, Application""
                                 }
                                 event-adapter-bindings
                                 {
                                     ""Application.Dtos.IDto, Application"" = protobuf
-                                    ""System.Byte[], System.Private.CoreLib"" = protobuf
+                                    ""Application.Persistence.ProtobufContract, Application"" = protobuf
                                 }
                             }
                         }
@@ -56,15 +56,15 @@ namespace Host
                             plugin = ""akka.persistence.journal.mongodb""
                             mongodb {
                                 class = ""Akka.Persistence.MongoDb.Journal.MongoDbJournal, Akka.Persistence.MongoDb""
-                                connection-string = ""mongodb://localhost:C2y6yDjf5%2FR%2Bob0N8A7Cgv30VRDJIWEHLM%2B4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw%2FJw%3D%3D@localhost:10255/dan?ssl=true""
+                                connection-string = ""mongodb://localhost:xxxxxx@localhost:10255/admin?ssl=true""
                         
                                 event-adapters {
-                                    protobuf = ""Application.ProtobufEventAdapter, Application""
+                                    protobuf = ""Application.Persistence.ProtobufEventAdapter, Application""
                                 }
                                 event-adapter-bindings
                                 {
                                      ""Application.Dtos.IDto, Application"" = protobuf
-                                     ""System.Byte[], System.Private.CoreLib"" = protobuf
+                                     ""Application.Persistence.ProtobufContract, Application"" = protobuf
                                 }
                             }
                         }
@@ -72,7 +72,7 @@ namespace Host
                             plugin = ""akka.persistence.snapshot-store.mongodb""
                             mongodb {
                                 class = ""Akka.Persistence.MongoDb.Snapshot.MongoDbSnapshotStore, Akka.Persistence.MongoDb""
-                                connection-string = ""mongodb://localhost:C2y6yDjf5%2FR%2Bob0N8A7Cgv30VRDJIWEHLM%2B4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw%2FJw%3D%3D@localhost:10255/dan?ssl=true""
+                                connection-string = ""mongodb://localhost:xxxxxx@localhost:10255/admin?ssl=true""
                             }
                         }
                     }
@@ -89,7 +89,7 @@ namespace Host
 				            application {
 				                class = ""Akka.Persistence.SqlServer.Journal.SqlServerJournal, Akka.Persistence.SqlServer""
 				                plugin-dispatcher = ""akka.actor.default-dispatcher""
-				                connection-string = ""Data Source=localhost;Initial Catalog=imburse-payout;Integrated Security=True;MultipleActiveResultSets=true""
+				                connection-string = ""Data Source=localhost;Initial Catalog=test;Integrated Security=True;MultipleActiveResultSets=true""
 				                connection-timeout = 30s
 				                schema-name = dbo
 				                table-name = EventJournal
@@ -98,12 +98,12 @@ namespace Host
 				                metadata-table-name = Metadata
 
                                 event-adapters {
-                                    protobuf = ""Application.ProtobufEventAdapter, Application""
+                                    protobuf = ""Application.Persistence.ProtobufEventAdapter, Application""
                                 }
                                 event-adapter-bindings
                                 {
                                      ""Application.Dtos.IDto, Application"" = protobuf
-                                     ""System.Byte[], System.Private.CoreLib"" = protobuf
+                                     ""Application.Persistence.ProtobufContract, Application"" = protobuf
                                 }
 			                }
                         }
@@ -115,7 +115,7 @@ namespace Host
 			                application {
 				                class = ""Akka.Persistence.SqlServer.Snapshot.SqlServerSnapshotStore, Akka.Persistence.SqlServer""
 				                plugin-dispatcher = ""akka.actor.default-dispatcher""
-				                connection-string = ""Data Source=localhost;Initial Catalog=imburse-payout;Integrated Security=True;MultipleActiveResultSets=true""
+				                connection-string = ""Data Source=localhost;Initial Catalog=test;Integrated Security=True;MultipleActiveResultSets=true""
 				                connection-timeout = 30s
 				                schema-name = dbo
 				                table-name = SnapshotStore
@@ -164,9 +164,9 @@ namespace Host
                 
 
                 _config = Config.Empty
-                    .WithFallback(InMemory)
+                    //.WithFallback(InMemory)
                     //.WithFallback(MongoDb)
-                    //.WithFallback(Sql)
+                    .WithFallback(Sql)
                     .WithFallback(hocon);
             }
 

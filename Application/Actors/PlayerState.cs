@@ -6,23 +6,23 @@ namespace Application.Actors
 {
     internal class PlayerState
     {
-        private readonly ImmutableList<object> _events;
+        public readonly ImmutableList<IDto> Events;
 
-        public PlayerState(ImmutableList<object> events)
+        public PlayerState(ImmutableList<IDto> events)
         {
-            _events = events;
+            Events = events;
         }
 
         public PlayerState()
-            : this(ImmutableList.Create<object>())
+            : this(ImmutableList.Create<IDto>())
         {
         }
 
-        public PlayerState Update(object state)
+        public PlayerState Update(IDto state)
         {
-            return new PlayerState(_events.Add(state));
+            return new PlayerState(Events.Add(state));
         }
 
-        public string Hits => string.Join(",", _events.OfType<IDto>().Select(x => x.HitType));
+        public string Hits => string.Join(",", Events.Select(x => x.HitType));
     }
 }

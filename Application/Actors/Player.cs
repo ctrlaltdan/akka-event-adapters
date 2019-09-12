@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Akka.Actor;
 using Akka.Event;
 using Akka.Logger.Serilog;
 using Akka.Persistence;
 using Application.Dtos;
+using Application.Persistence;
 
 namespace Application.Actors
 {
     public class Player : ReceivePersistentActor
     {
         public override string PersistenceId { get; }
-    
+        private const int SnapshotInterval = 3;
+
         private PlayerState _state = new PlayerState();
         private static ILoggingAdapter Logger => Context.GetLogger<SerilogLoggingAdapter>();
         
@@ -20,6 +23,17 @@ namespace Application.Actors
             PersistenceId = id;
 
             var stopwatch = Stopwatch.StartNew();
+
+            Recover<SnapshotOffer>(offer =>
+            {
+                if (!(offer.Snapshot is ProtobufContracts contracts))
+                {
+                    Log.Error("Unhandled snapshot type {Type} received.", offer.Snapshot.GetType());
+                    return;
+                }
+                foreach (var dto in contracts.Dtos)
+                    _state = _state.Update(dto);
+            });
 
             Recover<IDto>(state =>
             {
@@ -77,6 +91,8 @@ namespace Application.Actors
                 });
             });
             
+            Command<SaveSnapshotSuccess>(success => Logger.Debug("Saved snapshot {SequenceNr}.", success.Metadata.SequenceNr));
+            Command<SaveSnapshotFailure>(failure => Logger.Error(failure.Cause, "Failed to save snapshot {SequenceNr}.", failure.Metadata));
             Command<ReceiveTimeout>(_ =>
             {
                 Logger.Info("Received timeout after {Duration}ms. Stopping Actor.", stopwatch.ElapsedMilliseconds);
@@ -92,6 +108,10 @@ namespace Application.Actors
                 Logger.Info("State {Type} persisted in {Duration}ms.", state.GetType().Name, stopwatch.ElapsedMilliseconds);
                 _state = _state.Update(state);
                 onSuccess.Invoke();
+                if (LastSequenceNr % SnapshotInterval == 0 && LastSequenceNr != 0)
+                {
+                    SaveSnapshot(_state.Events.ToProtobufContracts());
+                }
             });
         }
 

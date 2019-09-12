@@ -1,4 +1,5 @@
 ﻿using System;
+using Application.Persistence;
 using ProtoBuf;
 
 namespace Application.Dtos

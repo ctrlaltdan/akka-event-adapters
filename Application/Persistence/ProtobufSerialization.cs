@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Akka.Persistence.Journal;
+using Application.Dtos;
 
-namespace Application
+namespace Application.Persistence
 {
-    public class ProtobufEventAdapter : IEventAdapter
+    public static class ProtobufSerialization
     {
         public static object Warm() => null;
+        public static readonly string ProtoContractType = typeof(ProtobufContract).AssemblyQualifiedName;
+
         private static readonly Dictionary<string, Type> Dtos;
 
         /// <summary>
         /// Scans the defined assemblies for classes decorated with a [JournalEntry(manifest)] attribute
         /// and adds the manifest property, and the class type to the static Dtos dictionary.
         /// </summary>
-        static ProtobufEventAdapter()
+        static ProtobufSerialization()
         {
             var assemblies = new[]
             {
@@ -36,7 +39,7 @@ namespace Application
                 .ToDictionary(key => ((JournalEntryAttribute)key.attribute).Manifest, value => value.type);
         }
 
-        public string Manifest(object evt)
+        public static ProtobufContract ToProtobufContract(object evt)
         {
             var attribute = evt
                 .GetType()
@@ -46,29 +49,26 @@ namespace Application
             if (attribute == null)
                 throw new Exception("Attribute not found on Journal entry.");
 
-            return ((JournalEntryAttribute)attribute).Manifest;
-        }
+            var type = ((JournalEntryAttribute)attribute).Manifest;
 
-        public object ToJournal(object evt)
-        {
             using (var stream = new MemoryStream())
             {
                 ProtoBuf.Serializer.Serialize(stream, evt);
-                return stream.ToArray();
+                return new ProtobufContract(type, stream.ToArray());
             }
         }
 
-        public IEventSequence FromJournal(object evt, string manifest)
+        public static IDto FromProtobufContract(object evt)
         {
-            if (!(evt is byte[] bytes))
-                throw new Exception("Cannot cast journal entry as byte array.");
+            if (!(evt is ProtobufContract protobuf))
+                throw new Exception("Cannot cast journal entry as protobuf contract.");
 
-            if (!Dtos.TryGetValue(manifest, out var type))
-                throw new Exception($"Unknown manifest type [{manifest}].");
+            if (!Dtos.TryGetValue(protobuf.Type, out var type))
+                throw new Exception($"Unknown dto type [{protobuf.Type}].");
 
-            using (var stream = new MemoryStream(bytes))
+            using (var stream = new MemoryStream(protobuf.Body))
             {
-                return EventSequence.Single(ProtoBuf.Serializer.Deserialize(type, stream));
+                return ProtoBuf.Serializer.Deserialize(type, stream) as IDto;
             }
         }
     }

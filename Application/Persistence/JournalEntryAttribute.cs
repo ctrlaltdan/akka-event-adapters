@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Application
+namespace Application.Persistence
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class JournalEntryAttribute : Attribute

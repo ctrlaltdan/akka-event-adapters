@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.Loader;
-using Application;
+using Application.Persistence;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
@@ -13,7 +13,7 @@ namespace Host
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            ProtobufEventAdapter.Warm();
+            ProtobufSerialization.Warm();
 
             LocalSystem
                 .Bootstrap()

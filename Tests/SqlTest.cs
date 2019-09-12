@@ -18,7 +18,7 @@ namespace Tests
         [Fact]
         public async Task Test()
         {
-            const string playerId = "Yoshimitsu";
+            const string playerId = "Law";
 
             var actor1 = Sys.ActorOf(Player.Props(playerId));
 
